@@ -1,8 +1,8 @@
 {
   "name": "signaling-server",
   "private": true,
-  "type": "module",
   "scripts": {
+    "start": "node dist/apps/signaling-server/src/main.js",
     "start:dev": "nest start --watch",
     "build": "nest build",
     "test": "jest --runInBand",

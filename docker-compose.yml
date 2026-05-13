@@ -1,0 +1,42 @@
+services:
+  signaling-server:
+    build:
+      context: .
+      dockerfile: apps/signaling-server/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    expose:
+      - "3000"
+
+  viewer-web:
+    build:
+      context: .
+      dockerfile: apps/viewer-web/Dockerfile
+    expose:
+      - "4173"
+
+  coturn:
+    image: coturn/coturn:4.6
+    network_mode: host
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    # TURN_SECRET 不能写进仓库；这里通过 compose 变量注入 Coturn 长期共享密钥。
+    command:
+      - -c
+      - /etc/coturn/turnserver.conf
+      - --static-auth-secret=${TURN_SECRET:-replace-me}
+      - --realm=${TURN_REALM:-monitor.local}
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - signaling-server
+      - viewer-web
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
