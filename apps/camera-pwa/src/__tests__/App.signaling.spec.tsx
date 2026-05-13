@@ -67,4 +67,25 @@ describe('Camera App signaling', () => {
       });
     });
   });
+
+  it('shows an error when signaling connection fails after camera starts', async () => {
+    const socket = createFakeSocket();
+    const createCameraSocket = vi.fn(() => socket);
+
+    vi.doMock('../lib/signaling-client', () => ({ createCameraSocket }));
+
+    const { App } = await import('../App');
+    const { screen } = await import('@testing-library/react');
+
+    render(<App />);
+    await waitFor(() => {
+      expect(socket.on).toHaveBeenCalledWith('connect_error', expect.any(Function));
+    });
+
+    await socket.dispatch('connect_error', new Error('websocket failed'));
+
+    await waitFor(() => {
+      expect(screen.getByText('连接失败')).toBeTruthy();
+    });
+  });
 });

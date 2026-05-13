@@ -2,10 +2,14 @@
 
 ## 局域网链路
 
-1. 启动 `signaling-server`、`viewer-web`、`camera-pwa`。
-2. Android 真机打开 `camera-pwa`，允许摄像头和麦克风权限。
-3. 桌面浏览器打开 `viewer-web`。
-4. 确认 Viewer 状态从“连接中”切到“直播中”，并可听到实时音频。
+1. 在仓库根目录创建本地 `.env`，确保 `CAMERA_DEVICE_TOKEN`、`VIEWER_ACCESS_TOKEN` 与 `VITE_CAMERA_DEVICE_TOKEN`、`VITE_VIEWER_ACCESS_TOKEN` 一致。
+2. 将 `VITE_SIGNALING_ORIGIN` 设置为局域网可访问地址，例如 `http://192.168.x.x:3000`。
+3. 启动 signaling-server：`pnpm --filter signaling-server start:dev`。
+4. 启动 camera-pwa：`pnpm --filter camera-pwa dev -- --host 0.0.0.0 --port 5174`。
+5. 启动 viewer-web：`pnpm --filter viewer-web dev -- --host 0.0.0.0 --port 5173`。
+6. Android 真机打开 `http://192.168.x.x:5174`，允许摄像头和麦克风权限。
+7. 桌面浏览器打开 `http://127.0.0.1:5173` 或 `http://192.168.x.x:5173`。
+8. 确认 Viewer 状态从“连接中”切到“直播中”，并可听到实时音频。
 
 ## HTTPS 真机联调
 

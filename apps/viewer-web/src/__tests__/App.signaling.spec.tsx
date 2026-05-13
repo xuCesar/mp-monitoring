@@ -61,4 +61,21 @@ describe('Viewer App signaling', () => {
       });
     });
   });
+
+  it('shows an error when signaling connection fails', async () => {
+    const socket = createFakeSocket();
+    const createViewerSocket = vi.fn(() => socket);
+
+    vi.doMock('../lib/signaling-client', () => ({ createViewerSocket }));
+
+    const { App } = await import('../App');
+    const { screen } = await import('@testing-library/react');
+
+    render(<App />);
+    await socket.dispatch('connect_error', new Error('websocket failed'));
+
+    await waitFor(() => {
+      expect(screen.getByText('连接失败')).toBeTruthy();
+    });
+  });
 });

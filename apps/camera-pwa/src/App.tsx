@@ -87,6 +87,10 @@ export function App() {
       setStatus('error');
     });
 
+    socket.on('connect_error', () => {
+      setStatus('error');
+    });
+
     return () => {
       isActive = false;
       socket.disconnect();
