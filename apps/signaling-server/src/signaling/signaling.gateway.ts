@@ -66,17 +66,36 @@ export class SignalingGateway {
   }
 
   @SubscribeMessage('offer')
-  handleOffer(@MessageBody() body: OfferPayload) {
-    this.server.to(body.targetSocketId).emit('offer', body);
+  handleOffer(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: OfferPayload,
+  ) {
+    this.server.to(body.targetSocketId).emit('offer', {
+      ...body,
+      // 由服务端附加真实发送方，避免客户端伪造 sourceSocketId。
+      sourceSocketId: client.id,
+    });
   }
 
   @SubscribeMessage('answer')
-  handleAnswer(@MessageBody() body: OfferPayload) {
-    this.server.to(body.targetSocketId).emit('answer', body);
+  handleAnswer(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: OfferPayload,
+  ) {
+    this.server.to(body.targetSocketId).emit('answer', {
+      ...body,
+      sourceSocketId: client.id,
+    });
   }
 
   @SubscribeMessage('ice-candidate')
-  handleIceCandidate(@MessageBody() body: IceCandidatePayload) {
-    this.server.to(body.targetSocketId).emit('ice-candidate', body);
+  handleIceCandidate(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: IceCandidatePayload,
+  ) {
+    this.server.to(body.targetSocketId).emit('ice-candidate', {
+      ...body,
+      sourceSocketId: client.id,
+    });
   }
 }

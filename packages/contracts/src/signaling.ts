@@ -12,10 +12,23 @@ export interface OfferPayload {
   sdp: RTCSessionDescriptionInit;
 }
 
+export interface RelayedSessionDescriptionPayload extends OfferPayload {
+  sourceSocketId: string;
+}
+
 export interface IceCandidatePayload {
   roomId: string;
   targetSocketId: string;
   candidate: RTCIceCandidateInit;
+}
+
+export interface RelayedIceCandidatePayload extends IceCandidatePayload {
+  sourceSocketId: string;
+}
+
+export interface ViewerJoinedPayload {
+  roomId: string;
+  viewerSocketId: string;
 }
 
 export interface TurnCredentialsResponse {

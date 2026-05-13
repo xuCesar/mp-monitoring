@@ -62,4 +62,58 @@ describe('SignalingGateway', () => {
     });
     expect(client.disconnect).toHaveBeenCalled();
   });
+
+  it('rejects a fourth viewer through the gateway', () => {
+    const authService = new AuthService();
+    const gateway = new SignalingGateway(authService, new RoomStore(3));
+    gateway.server = { to: jest.fn(() => ({ emit: jest.fn() })) } as any;
+
+    gateway.handleJoinRoom(createClient('camera-1') as any, {
+      roomId: 'camera-01',
+      role: 'camera',
+      token: 'camera-token',
+    });
+
+    for (const socketId of ['viewer-1', 'viewer-2', 'viewer-3']) {
+      gateway.handleJoinRoom(createClient(socketId) as any, {
+        roomId: 'camera-01',
+        role: 'viewer',
+        token: 'viewer-token',
+      });
+    }
+
+    const fourthViewer = createClient('viewer-4');
+    gateway.handleJoinRoom(fourthViewer as any, {
+      roomId: 'camera-01',
+      role: 'viewer',
+      token: 'viewer-token',
+    });
+
+    expect(fourthViewer.emit).toHaveBeenCalledWith('error-event', {
+      code: 'ROOM_REJECTED',
+      message: 'viewer limit reached',
+    });
+    expect(fourthViewer.disconnect).toHaveBeenCalled();
+  });
+
+  it('attaches the sending socket id when forwarding offers', () => {
+    const authService = new AuthService();
+    const gateway = new SignalingGateway(authService, new RoomStore(3));
+    const emit = jest.fn();
+    gateway.server = { to: jest.fn(() => ({ emit })) } as any;
+
+    gateway.handleOffer(createClient('camera-1') as any, {
+      roomId: 'camera-01',
+      targetSocketId: 'viewer-1',
+      sdp: { type: 'offer', sdp: 'offer-sdp' },
+    });
+
+    expect(gateway.server.to).toHaveBeenCalledWith('viewer-1');
+    expect(emit).toHaveBeenCalledWith('offer', {
+      roomId: 'camera-01',
+      targetSocketId: 'viewer-1',
+      sourceSocketId: 'camera-1',
+      sdp: { type: 'offer', sdp: 'offer-sdp' },
+    });
+  });
 });
