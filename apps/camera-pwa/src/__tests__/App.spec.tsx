@@ -17,6 +17,7 @@ describe('Camera App', () => {
         on: vi.fn(),
         disconnect: vi.fn(),
       })),
+      parseSocketTransports: vi.fn(() => ['websocket', 'polling']),
     }));
 
     const { App } = await import('../App');

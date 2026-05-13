@@ -29,7 +29,10 @@ describe('Viewer App signaling', () => {
     const acceptOffer = vi.fn().mockResolvedValue({ type: 'answer', sdp: 'answer-sdp' });
     const createViewerSocket = vi.fn(() => socket);
 
-    vi.doMock('../lib/signaling-client', () => ({ createViewerSocket }));
+    vi.doMock('../lib/signaling-client', () => ({
+      createViewerSocket,
+      parseSocketTransports: vi.fn(() => ['websocket', 'polling']),
+    }));
     vi.doMock('../lib/peer-manager', () => ({
       createViewerPeerManager: vi.fn(() => ({ acceptOffer })),
     }));
@@ -66,7 +69,10 @@ describe('Viewer App signaling', () => {
     const socket = createFakeSocket();
     const createViewerSocket = vi.fn(() => socket);
 
-    vi.doMock('../lib/signaling-client', () => ({ createViewerSocket }));
+    vi.doMock('../lib/signaling-client', () => ({
+      createViewerSocket,
+      parseSocketTransports: vi.fn(() => ['websocket', 'polling']),
+    }));
 
     const { App } = await import('../App');
     const { screen } = await import('@testing-library/react');

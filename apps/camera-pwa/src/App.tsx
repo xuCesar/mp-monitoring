@@ -10,13 +10,14 @@ import { CameraPreview } from './components/CameraPreview';
 import { CameraStatus, type CameraConnectionStatus } from './components/CameraStatus';
 import { startCamera } from './lib/camera';
 import { createPublisherManager } from './lib/publisher-manager';
-import { createCameraSocket } from './lib/signaling-client';
+import { createCameraSocket, parseSocketTransports } from './lib/signaling-client';
 
 function readCameraConfig() {
   return {
     signalingOrigin: import.meta.env.VITE_SIGNALING_ORIGIN ?? window.location.origin,
     roomId: import.meta.env.VITE_ROOM_ID ?? 'camera-01',
     token: import.meta.env.VITE_CAMERA_DEVICE_TOKEN ?? 'camera-token',
+    transports: parseSocketTransports(import.meta.env.VITE_SOCKET_TRANSPORTS),
   };
 }
 
@@ -26,7 +27,12 @@ export function App() {
 
   useEffect(() => {
     const config = readCameraConfig();
-    const socket = createCameraSocket(config.signalingOrigin, config.token);
+    const socket = createCameraSocket(
+      config.signalingOrigin,
+      config.token,
+      undefined,
+      config.transports,
+    );
     let isActive = true;
 
     void startCamera()

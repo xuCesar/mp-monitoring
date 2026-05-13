@@ -37,7 +37,10 @@ describe('Camera App signaling', () => {
     const createOfferForViewer = vi.fn().mockResolvedValue({ type: 'offer', sdp: 'offer-sdp' });
     const createCameraSocket = vi.fn(() => socket);
 
-    vi.doMock('../lib/signaling-client', () => ({ createCameraSocket }));
+    vi.doMock('../lib/signaling-client', () => ({
+      createCameraSocket,
+      parseSocketTransports: vi.fn(() => ['websocket', 'polling']),
+    }));
     vi.doMock('../lib/publisher-manager', () => ({
       createPublisherManager: vi.fn(() => ({ createOfferForViewer })),
     }));
@@ -72,7 +75,10 @@ describe('Camera App signaling', () => {
     const socket = createFakeSocket();
     const createCameraSocket = vi.fn(() => socket);
 
-    vi.doMock('../lib/signaling-client', () => ({ createCameraSocket }));
+    vi.doMock('../lib/signaling-client', () => ({
+      createCameraSocket,
+      parseSocketTransports: vi.fn(() => ['websocket', 'polling']),
+    }));
 
     const { App } = await import('../App');
     const { screen } = await import('@testing-library/react');

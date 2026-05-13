@@ -14,11 +14,20 @@ import type { Server, Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
 import { RoomStore } from './room-store';
 
+function readSocketTransports() {
+  const configuredTransports = process.env.SOCKET_TRANSPORTS?.split(',')
+    .map((transport) => transport.trim())
+    .filter((transport) => transport === 'websocket' || transport === 'polling');
+
+  // 本地 HTTPS 隧道可能拦截直连 WebSocket，默认允许 polling 兜底。
+  return configuredTransports?.length ? configuredTransports : ['websocket', 'polling'];
+}
+
 @WebSocketGateway({
   cors: {
     origin: process.env.SIGNALING_ORIGIN,
   },
-  transports: ['websocket'],
+  transports: readSocketTransports(),
 })
 export class SignalingGateway {
   @WebSocketServer()

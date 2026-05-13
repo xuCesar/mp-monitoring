@@ -4,12 +4,13 @@
 
 1. 在仓库根目录创建本地 `.env`，确保 `CAMERA_DEVICE_TOKEN`、`VIEWER_ACCESS_TOKEN` 与 `VITE_CAMERA_DEVICE_TOKEN`、`VITE_VIEWER_ACCESS_TOKEN` 一致。
 2. 将 `VITE_SIGNALING_ORIGIN` 设置为局域网可访问地址，例如 `http://192.168.x.x:3000`。
-3. 启动 signaling-server：`pnpm --filter signaling-server start:dev`。
-4. 启动 camera-pwa：`pnpm --filter camera-pwa dev -- --host 0.0.0.0 --port 5174`。
-5. 启动 viewer-web：`pnpm --filter viewer-web dev -- --host 0.0.0.0 --port 5173`。
-6. Android 真机打开 `http://192.168.x.x:5174`，允许摄像头和麦克风权限。
-7. 桌面浏览器打开 `http://127.0.0.1:5173` 或 `http://192.168.x.x:5173`。
-8. 确认 Viewer 状态从“连接中”切到“直播中”，并可听到实时音频。
+3. 使用 ngrok/HTTPS 隧道时，设置 `VITE_SOCKET_TRANSPORTS=websocket,polling`，给不稳定的 WebSocket 隧道留 polling 回退。
+4. 启动 signaling-server：`pnpm --filter signaling-server start:dev`。
+5. 启动 camera-pwa：`pnpm --filter camera-pwa dev -- --host 0.0.0.0 --port 5174`。
+6. 启动 viewer-web：`pnpm --filter viewer-web dev -- --host 0.0.0.0 --port 5173`。
+7. Android 真机打开 `http://192.168.x.x:5174`，允许摄像头和麦克风权限。
+8. 桌面浏览器打开 `http://127.0.0.1:5173` 或 `http://192.168.x.x:5173`。
+9. 确认 Viewer 状态从“连接中”切到“直播中”，并可听到实时音频。
 
 ## HTTPS 真机联调
 

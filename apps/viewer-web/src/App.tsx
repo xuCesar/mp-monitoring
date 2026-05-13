@@ -8,13 +8,14 @@ import { useEffect, useRef, useState } from 'react';
 import { RemoteVideo } from './components/RemoteVideo';
 import { ViewerStatus, type ViewerConnectionStatus } from './components/ViewerStatus';
 import { createViewerPeerManager, type ViewerPeerManager } from './lib/peer-manager';
-import { createViewerSocket } from './lib/signaling-client';
+import { createViewerSocket, parseSocketTransports } from './lib/signaling-client';
 
 function readViewerConfig() {
   return {
     signalingOrigin: import.meta.env.VITE_SIGNALING_ORIGIN ?? window.location.origin,
     roomId: import.meta.env.VITE_ROOM_ID ?? 'camera-01',
     token: import.meta.env.VITE_VIEWER_ACCESS_TOKEN ?? 'viewer-token',
+    transports: parseSocketTransports(import.meta.env.VITE_SOCKET_TRANSPORTS),
   };
 }
 
@@ -26,7 +27,12 @@ export function App() {
 
   useEffect(() => {
     const config = readViewerConfig();
-    const socket = createViewerSocket(config.signalingOrigin, config.token);
+    const socket = createViewerSocket(
+      config.signalingOrigin,
+      config.token,
+      undefined,
+      config.transports,
+    );
     const joinPayload: JoinRoomPayload = {
       roomId: config.roomId,
       role: 'viewer',

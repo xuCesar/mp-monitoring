@@ -1,22 +1,42 @@
 import { io, type Socket } from 'socket.io-client';
 
+export type SocketTransport = 'websocket' | 'polling';
+
 interface CameraSocketOptions {
   auth: {
     token: string;
   };
-  transports: ['websocket'];
+  transports: SocketTransport[];
 }
 
 type CameraIoClient = (origin: string, options: CameraSocketOptions) => Socket;
+
+const defaultTransports: SocketTransport[] = ['websocket', 'polling'];
+
+export function parseSocketTransports(value?: string): SocketTransport[] {
+  if (!value) {
+    return defaultTransports;
+  }
+
+  const transports = value
+    .split(',')
+    .map((transport) => transport.trim())
+    .filter((transport): transport is SocketTransport =>
+      transport === 'websocket' || transport === 'polling',
+    );
+
+  return transports.length > 0 ? transports : defaultTransports;
+}
 
 export function createCameraSocket(
   origin: string,
   token: string,
   ioClient: CameraIoClient = io as CameraIoClient,
+  transports: SocketTransport[] = defaultTransports,
 ): Socket {
   return ioClient(origin, {
     auth: { token },
-    // Camera 端同样固定 websocket，避免 polling 降级影响 offer/answer 排障。
-    transports: ['websocket'],
+    // ngrok/HTTPS 隧道可能拦截直连 WebSocket，开发默认允许 polling 兜底。
+    transports,
   });
 }
