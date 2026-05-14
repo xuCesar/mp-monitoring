@@ -5,4 +5,10 @@ describe('camera-pwa vite config', () => {
   it('loads VITE_* variables from the monorepo root env file', () => {
     expect(readFileSync('vite.config.ts', 'utf8')).toContain("envDir: '../..'");
   });
+
+  it('allows deploy builds to set a non-root base path', () => {
+    expect(readFileSync('vite.config.ts', 'utf8')).toContain(
+      "base: process.env.VITE_BASE_PATH ?? '/'",
+    );
+  });
 });

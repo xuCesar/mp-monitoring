@@ -13,8 +13,27 @@ services:
     build:
       context: .
       dockerfile: apps/viewer-web/Dockerfile
+      args:
+        VITE_SIGNALING_ORIGIN: ${VITE_SIGNALING_ORIGIN:-http://127.0.0.1}
+        VITE_ROOM_ID: ${VITE_ROOM_ID:-camera-01}
+        VITE_VIEWER_ACCESS_TOKEN: ${VITE_VIEWER_ACCESS_TOKEN:-replace-me}
+        VITE_SOCKET_TRANSPORTS: ${VITE_SOCKET_TRANSPORTS:-websocket,polling}
+        VITE_BASE_PATH: /
     expose:
       - "4173"
+
+  camera-pwa:
+    build:
+      context: .
+      dockerfile: apps/camera-pwa/Dockerfile
+      args:
+        VITE_SIGNALING_ORIGIN: ${VITE_SIGNALING_ORIGIN:-http://127.0.0.1}
+        VITE_ROOM_ID: ${VITE_ROOM_ID:-camera-01}
+        VITE_CAMERA_DEVICE_TOKEN: ${VITE_CAMERA_DEVICE_TOKEN:-replace-me}
+        VITE_SOCKET_TRANSPORTS: ${VITE_SOCKET_TRANSPORTS:-websocket,polling}
+        VITE_BASE_PATH: /camera/
+    expose:
+      - "4174"
 
   coturn:
     image: coturn/coturn:4.6
@@ -38,5 +57,6 @@ services:
     depends_on:
       - signaling-server
       - viewer-web
+      - camera-pwa
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro

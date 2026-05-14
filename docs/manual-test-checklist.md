@@ -40,3 +40,11 @@
 4. Camera 向 Viewer 发送 `offer`。
 5. Viewer 向 Camera 返回 `answer`。
 6. 双方通过 `ice-candidate` 交换 ICE candidate。
+
+## 服务器快速部署
+
+1. 将域名解析到服务器公网 IP，并确认安全组开放 `80/tcp`、`443/tcp`、`3478/tcp`、`3478/udp`。
+2. 在服务器 `.env` 中设置 `VITE_SIGNALING_ORIGIN=https://你的域名`，并保持前后端 token 一致。
+3. 执行 `docker compose up -d --build`。
+4. 访问 `https://你的域名/` 打开 Viewer。
+5. 访问 `https://你的域名/camera/` 打开 Android Camera PWA。
